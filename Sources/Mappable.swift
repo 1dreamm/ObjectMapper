@@ -36,7 +36,7 @@ public protocol BaseMappable {
 
 public protocol Mappable: BaseMappable {
     /// This function can be used to validate JSON prior to mapping. Return nil to cancel mapping at this point
-    init?(map: Map)
+    init?(map: Map, realmId: Int?)
 }
 
 public protocol StaticMappable: BaseMappable {

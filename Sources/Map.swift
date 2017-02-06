@@ -123,6 +123,11 @@ public final class Map {
 		return currentValue as? T
 	}
 
+    public func getIdFromJson() -> Int? {
+        var id: Int?
+        id <- self["id"]
+        return id
+    }
 }
 
 /// Fetch value from JSON dictionary, loop through keyPathComponents until we reach the desired object

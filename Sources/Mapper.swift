@@ -102,7 +102,8 @@ public final class Mapper<N: BaseMappable> {
 				return object
 			}
 		} else if let klass = N.self as? Mappable.Type { // Check if object is Mappable
-			if var object = klass.init(map: map) as? N {
+            let id = map.getIdFromJson()
+            if var object = klass.init(map: map, realmId: id) as? N {
 				object.mapping(map: map)
 				return object
 			}
