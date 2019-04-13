@@ -1,8 +1,8 @@
 //
-//  NSDataTransformTests.swift
+//  CodableTransform.swift
 //  ObjectMapper
 //
-//  Created by Yagrushkin, Evgeny on 8/30/16.
+//  Created by Jari Kalinainen on 10/10/2018.
 //
 //  The MIT License (MIT)
 //
@@ -26,46 +26,40 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE.
 
-import XCTest
-import ObjectMapper
+import Foundation
 
-class DataTransformTests: XCTestCase {
-	
-	let mapper = Mapper<DataType>()
+/// Transforms JSON dictionary to Codable type T and back
+open class CodableTransform<T: Codable>: TransformType {
 
-	func testDataTransform() {
+    public typealias Object = T
+    public typealias JSON = Any
 
-		let dataLength = 20
-		let bytes = malloc(dataLength)
-		
-		let data = Data(bytes: bytes!, count: dataLength)
-		let dataString = data.base64EncodedString()
-		let JSONString = "{\"data\" : \"\(dataString)\"}"
-		
-		let mappedObject = mapper.map(JSONString: JSONString)
+    public init() {}
 
-		XCTAssertNotNil(mappedObject)
-		XCTAssertEqual(mappedObject?.stringData, dataString)
-		XCTAssertEqual(mappedObject?.data, data)
-	}
+    open func transformFromJSON(_ value: Any?) -> Object? {
+        guard let dict = value as? [String: Any], let data = try? JSONSerialization.data(withJSONObject: dict, options: []) else {
+            return nil
+        }
+        do {
+            let decoder = JSONDecoder()
+            let item = try decoder.decode(T.self, from: data)
+            return item
+        } catch {
+            return nil
+        }
+    }
 
-}
-
-class DataType: Mappable {
-	
-	var data: Data?
-	var stringData: String?
-	
-	init(){
-		
-	}
-	
-	required init?(map: Map){
-		
-	}
-	
-	func mapping(map: Map) {
-		stringData <- map["data"]
-		data <- (map["data"], DataTransform())
-	}
+    open func transformToJSON(_ value: T?) -> JSON? {
+        guard let item = value else {
+            return nil
+        }
+        do {
+            let encoder = JSONEncoder()
+            let data = try encoder.encode(item)
+            let dictionary = try JSONSerialization.jsonObject(with: data, options: .allowFragments)
+            return dictionary
+        } catch {
+            return nil
+        }
+    }
 }

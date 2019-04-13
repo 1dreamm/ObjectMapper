@@ -1,10 +1,8 @@
 //
-//  NSDataTransformTests.swift
+//  URLTransformTests.swift
 //  ObjectMapper
 //
-//  Created by Yagrushkin, Evgeny on 8/30/16.
-//
-//  The MIT License (MIT)
+//  Created by pawel-rusin on 4/7/17.
 //
 //  Copyright (c) 2014-2018 Tristan Himmelman
 //
@@ -29,43 +27,23 @@
 import XCTest
 import ObjectMapper
 
-class DataTransformTests: XCTestCase {
-	
-	let mapper = Mapper<DataType>()
+class URLTransformTests: XCTestCase {
 
-	func testDataTransform() {
+    func testUrlQueryAllowed() {
+        let urlTransform = URLTransform()
+        let input = "https://example.com/search?query=foo"
+        let output = urlTransform.transformFromJSON(input)
 
-		let dataLength = 20
-		let bytes = malloc(dataLength)
-		
-		let data = Data(bytes: bytes!, count: dataLength)
-		let dataString = data.base64EncodedString()
-		let JSONString = "{\"data\" : \"\(dataString)\"}"
-		
-		let mappedObject = mapper.map(JSONString: JSONString)
+        XCTAssertEqual(output, URL(string: "https://example.com/search?query=foo"))
+    }
 
-		XCTAssertNotNil(mappedObject)
-		XCTAssertEqual(mappedObject?.stringData, dataString)
-		XCTAssertEqual(mappedObject?.data, data)
-	}
+    func testCanPassInAllowedCharacterSet() {
+        var characterSet = CharacterSet.urlQueryAllowed
+        characterSet.insert(charactersIn: "%")
+        let urlTransform = URLTransform(allowedCharacterSet: characterSet)
+        let input = "https://example.com/%25"
+        let output = urlTransform.transformFromJSON(input)
 
-}
-
-class DataType: Mappable {
-	
-	var data: Data?
-	var stringData: String?
-	
-	init(){
-		
-	}
-	
-	required init?(map: Map){
-		
-	}
-	
-	func mapping(map: Map) {
-		stringData <- map["data"]
-		data <- (map["data"], DataTransform())
-	}
+        XCTAssertEqual(output, URL(string: "https://example.com/%25"))
+    }
 }
