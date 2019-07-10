@@ -25,7 +25,6 @@
 //  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE.
-
 internal final class FromJSON {
 	
 	/// Basic type
@@ -58,7 +57,6 @@ internal final class FromJSON {
 	}
 	
 	/// Optional Mappable Object
-
 	class func optionalObject<N: BaseMappable>(_ field: inout N?, map: Map) {
 		if let f = field , map.toObject && map.currentValue != nil {
 			 field = Mapper(context: map.context).map(JSONObject: map.currentValue, toObject: f)
@@ -87,7 +85,6 @@ internal final class FromJSON {
 	}
 	
 	/// optional mappable object array
-
 	class func optionalObjectArray<N: BaseMappable>(_ field: inout Array<N>?, map: Map) {
 		if let objects: Array<N> = Mapper(context: map.context).mapArray(JSONObject: map.currentValue) {
 			field = objects
